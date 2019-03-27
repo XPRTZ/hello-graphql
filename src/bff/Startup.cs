@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using bff.Models;
 using bff.Repository;
+using GraphQL;
+using GraphQL.Server;
+using GraphQL.Server.Ui.Playground;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -18,6 +21,9 @@ namespace bff
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
+
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -33,9 +39,8 @@ namespace bff
             builder.AddEnvironmentVariables();
 
             Configuration = builder.Build();
+            Environment = env;
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -46,6 +51,14 @@ namespace bff
 
             services.AddScoped<CustomerRepository>();
 
+            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
+
+            services.AddScoped<ChinookSchema>();
+
+            services.AddGraphQL(o => { o.ExposeExceptions = Environment.IsDevelopment(); })
+                .AddGraphTypes(ServiceLifetime.Scoped)
+                .AddUserContextBuilder(httpContext => httpContext.User);
+                
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -62,6 +75,9 @@ namespace bff
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            app.UseGraphQL<ChinookSchema>();
+            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
         }
     }
 }
