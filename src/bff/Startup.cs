@@ -50,14 +50,6 @@ namespace bff
                     options.UseNpgsql(Configuration["DefaultConnection"]));
 
             services.AddScoped<CustomerRepository>();
-
-            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
-
-            services.AddScoped<ChinookSchema>();
-
-            services.AddGraphQL(o => { o.ExposeExceptions = Environment.IsDevelopment(); })
-                .AddGraphTypes(ServiceLifetime.Scoped)
-                .AddUserContextBuilder(httpContext => httpContext.User);
                 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -75,9 +67,6 @@ namespace bff
 
             app.UseHttpsRedirection();
             app.UseMvc();
-
-            app.UseGraphQL<ChinookSchema>();
-            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
         }
     }
 }
