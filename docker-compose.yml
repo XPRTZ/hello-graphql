@@ -1,0 +1,24 @@
+version: "2"
+
+networks:
+  postgres:
+    external: false
+
+volumes:
+  postgres:
+    driver: local
+
+services:
+  db:
+    image: postgres:11.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root1234!
+      - POSTGRES_DB=Chinook
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks: 
+      - postgres
