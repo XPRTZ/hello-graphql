@@ -10,7 +10,10 @@ docker-compose up -d
 ## Seeding the database
 1. Create a new database chinook
 2. Run the provide sql to seed the database
-
 ```bash
-Chinook_Postgres
+scripts\Chinook_Postgres.sql
+```
+3. Add the user secrets to your environment
+```bash
+dotnet user-secrets set DefaultConnection "Host=localhost;Database=chinook;Username=root;Password=root1234\!"
 ```
